@@ -3,11 +3,19 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { useAuth } from '@/context/AuthContext'
 import { analyticsAPI } from '@/lib/api'
 import { ArrowPathIcon, ChartBarIcon, HeartIcon, EyeIcon, ChatBubbleLeftIcon, ShareIcon } from '@heroicons/react/24/outline'
 
-type Platform = 'facebook' | 'instagram' | 'twitter'
+type Platform = 'facebook' | 'instagram' | 'twitter' | 'linkedin'
 
 interface AnalyticsData {
   posts: number
@@ -75,10 +83,10 @@ export default function Analytics() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex items-center space-x-3">
-          <ArrowPathIcon className="w-6 h-6 animate-spin text-purple-600" />
-          <span className="text-lg text-gray-600">Loading...</span>
+          <ArrowPathIcon className="w-6 h-6 animate-spin text-blue-600" />
+          <span className="text-lg text-slate-600">Loading...</span>
         </div>
       </div>
     )
@@ -89,14 +97,14 @@ export default function Analytics() {
       id: 'twitter' as Platform, 
       name: 'X (Twitter)', 
       icon: 'X', 
-      color: 'bg-gray-900',
+      color: 'bg-slate-900',
       connected: !!user?.twitterAccount
     },
     { 
       id: 'instagram' as Platform, 
       name: 'Instagram', 
       icon: 'ig', 
-      color: 'bg-gradient-to-r from-purple-500 to-pink-500',
+      color: 'bg-blue-500',
       connected: !!user?.facebookAccount?.instagram_accounts?.length
     },
     { 
@@ -106,6 +114,13 @@ export default function Analytics() {
       color: 'bg-blue-600',
       connected: !!user?.facebookAccount
     },
+    { 
+      id: 'linkedin' as Platform, 
+      name: 'LinkedIn', 
+      icon: 'in', 
+      color: 'bg-blue-700',
+      connected: !!user?.linkedinAccount
+    },
   ]
 
   const currentPlatform = platforms.find(p => p.id === selectedPlatform)
@@ -114,116 +129,131 @@ export default function Analytics() {
   const analytics = analyticsData
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
       
       <div className="flex-1">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-10">
+        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-10">
           <div className="px-8 py-5">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900 mb-1">Analytics</h1>
-              <p className="text-sm text-gray-500">Track your social media performance across platforms</p>
+              <h1 className="text-2xl font-semibold text-slate-900 mb-1">Analytics</h1>
+              <p className="text-sm text-slate-500">Track your social media performance across platforms</p>
             </div>
           </div>
         </header>
 
         <div className="p-8 max-w-7xl mx-auto">
           {/* Platform Tabs */}
-          <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-100 mb-8 flex space-x-2">
+          <Card className="mb-8 border-slate-200">
+            <CardContent className="p-2 flex space-x-2">
             {platforms.map((platform) => (
-              <button
+              <Button
                 key={platform.id}
                 onClick={() => setSelectedPlatform(platform.id)}
                 disabled={!platform.connected}
+                variant={selectedPlatform === platform.id ? 'default' : 'secondary'}
                 className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
                   selectedPlatform === platform.id
-                    ? 'bg-purple-600 text-white shadow-md'
+                    ? 'shadow-sm'
                     : platform.connected
-                    ? 'text-gray-700 hover:bg-gray-100'
-                    : 'text-gray-400 cursor-not-allowed opacity-50'
+                    ? 'text-slate-700'
+                    : 'text-slate-400'
                 }`}
               >
-                <div className={`w-8 h-8 ${platform.color} rounded-lg flex items-center justify-center ${selectedPlatform === platform.id ? 'bg-white/20' : ''}`}>
-                  <span className={`text-xs font-bold ${selectedPlatform === platform.id ? 'text-white' : 'text-white'}`}>
+                <div className={`w-8 h-8 ${platform.color} rounded-lg flex items-center justify-center ${selectedPlatform === platform.id ? 'bg-white/10' : ''}`}>
+                  <span className="text-xs font-bold text-white">
                     {platform.icon}
                   </span>
                 </div>
                 <span>{platform.name}</span>
-              </button>
+              </Button>
             ))}
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Analytics Content */}
           {loadingAnalytics ? (
             <div className="flex items-center justify-center py-20">
               <div className="flex items-center space-x-3">
-                <ArrowPathIcon className="w-8 h-8 animate-spin text-purple-600" />
-                <span className="text-lg text-gray-600">Loading analytics...</span>
+                <ArrowPathIcon className="w-8 h-8 animate-spin text-blue-600" />
+                <span className="text-lg text-slate-600">Loading analytics...</span>
               </div>
             </div>
           ) : currentPlatform?.connected && analytics ? (
             <>
               {/* Stats Overview */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-all duration-300">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                      <ChartBarIcon className="w-6 h-6 text-purple-600" />
+                <Card className="border-slate-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                        <ChartBarIcon className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div className="flex items-center space-x-1 text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-full">
+                        <span>↑</span>
+                        <span>{analytics.growthRate}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-1 text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-full">
-                      <span>↑</span>
-                      <span>{analytics.growthRate}</span>
-                    </div>
-                  </div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Total Posts</p>
-                  <p className="text-3xl font-semibold text-gray-900">{analytics.posts}</p>
-                </div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">Total Posts</p>
+                    <p className="text-3xl font-semibold text-slate-900">{analytics.posts}</p>
+                  </CardContent>
+                </Card>
 
-                <div className="bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-all duration-300">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                      <EyeIcon className="w-6 h-6 text-blue-600" />
+                <Card className="border-slate-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                        <EyeIcon className="w-6 h-6 text-blue-600" />
+                      </div>
                     </div>
-                  </div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Impressions</p>
-                  <p className="text-3xl font-semibold text-gray-900">{analytics.impressions.toLocaleString()}</p>
-                </div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">Impressions</p>
+                    <p className="text-3xl font-semibold text-slate-900">{analytics.impressions.toLocaleString()}</p>
+                  </CardContent>
+                </Card>
 
-                <div className="bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-all duration-300">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-pink-50 rounded-xl flex items-center justify-center">
-                      <HeartIcon className="w-6 h-6 text-pink-600" />
+                <Card className="border-slate-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                        <HeartIcon className="w-6 h-6 text-blue-600" />
+                      </div>
                     </div>
-                  </div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Total Engagements</p>
-                  <p className="text-3xl font-semibold text-gray-900">{analytics.engagements.toLocaleString()}</p>
-                </div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">Total Engagements</p>
+                    <p className="text-3xl font-semibold text-slate-900">{analytics.engagements.toLocaleString()}</p>
+                  </CardContent>
+                </Card>
 
-                <div className="bg-white rounded-xl p-6 border border-gray-100 hover:shadow-lg transition-all duration-300">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                      <ChatBubbleLeftIcon className="w-6 h-6 text-orange-600" />
+                <Card className="border-slate-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                        <ChatBubbleLeftIcon className="w-6 h-6 text-blue-600" />
+                      </div>
                     </div>
-                  </div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Total Likes</p>
-                  <p className="text-3xl font-semibold text-gray-900">{analytics.likes.toLocaleString()}</p>
-                </div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">Total Likes</p>
+                    <p className="text-3xl font-semibold text-slate-900">{analytics.likes.toLocaleString()}</p>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Engagement Breakdown */}
               <div className="grid lg:grid-cols-2 gap-8 mb-8">
-                <div className="bg-white rounded-xl p-6 border border-gray-100">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Engagement Breakdown</h3>
+                <Card className="border-slate-200">
+                  <CardHeader>
+                    <CardTitle className="text-slate-900">Engagement Breakdown</CardTitle>
+                    <CardDescription>See how audiences are interacting.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
                   <div className="space-y-4">
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-gray-600">Likes</span>
-                        <span className="text-sm font-semibold text-gray-900">{analytics.likes}</span>
+                        <span className="text-sm text-slate-600">Likes</span>
+                        <span className="text-sm font-semibold text-slate-900">{analytics.likes}</span>
                       </div>
-                      <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div className="w-full bg-slate-100 rounded-full h-2">
                         <div 
-                          className="bg-pink-500 h-2 rounded-full transition-all duration-500" 
+                          className="bg-blue-500 h-2 rounded-full transition-all duration-500" 
                           style={{ 
                             width: `${analytics.engagements > 0 ? Math.min((analytics.likes / analytics.engagements) * 100, 100) : 0}%` 
                           }}
@@ -232,16 +262,16 @@ export default function Analytics() {
                     </div>
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-slate-600">
                           {selectedPlatform === 'twitter' ? 'Retweets' : 'Shares'}
                         </span>
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-semibold text-slate-900">
                           {selectedPlatform === 'twitter' ? (analytics.retweets || 0) : (analytics.shares || 0)}
                         </span>
                       </div>
-                      <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div className="w-full bg-slate-100 rounded-full h-2">
                         <div 
-                          className="bg-green-500 h-2 rounded-full transition-all duration-500" 
+                          className="bg-blue-500 h-2 rounded-full transition-all duration-500" 
                           style={{ 
                             width: `${analytics.engagements > 0 ? Math.min(((selectedPlatform === 'twitter' ? (analytics.retweets || 0) : (analytics.shares || 0)) / analytics.engagements) * 100, 100) : 0}%` 
                           }}
@@ -250,14 +280,14 @@ export default function Analytics() {
                     </div>
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-slate-600">
                           {selectedPlatform === 'twitter' ? 'Replies' : 'Comments'}
                         </span>
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-semibold text-slate-900">
                           {selectedPlatform === 'twitter' ? (analytics.replies || 0) : (analytics.comments || 0)}
                         </span>
                       </div>
-                      <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div className="w-full bg-slate-100 rounded-full h-2">
                         <div 
                           className="bg-blue-500 h-2 rounded-full transition-all duration-500" 
                           style={{ 
@@ -267,32 +297,37 @@ export default function Analytics() {
                       </div>
                     </div>
                   </div>
-                </div>
+                  </CardContent>
+                </Card>
 
                 {/* Top Performing Post */}
-                <div className="bg-white rounded-xl p-6 border border-gray-100">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Top Performing Post</h3>
+                <Card className="border-slate-200">
+                  <CardHeader>
+                    <CardTitle className="text-slate-900">Top Performing Post</CardTitle>
+                    <CardDescription>Best post from the selected timeframe.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
                   {analytics.topPost ? (
-                    <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                      <p className="text-gray-700 mb-4">
+                    <div className="bg-slate-50 rounded-xl p-4 mb-4">
+                      <p className="text-slate-700 mb-4">
                         {selectedPlatform === 'instagram' 
                           ? (analytics.topPost.caption || 'No caption') 
                           : (analytics.topPost.text || 'No text')}
                       </p>
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">Impressions</p>
-                          <p className="text-lg font-semibold text-gray-900">{analytics.topPost.impressions.toLocaleString()}</p>
+                          <p className="text-xs text-slate-500 mb-1">Impressions</p>
+                          <p className="text-lg font-semibold text-slate-900">{analytics.topPost.impressions.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">Likes</p>
-                          <p className="text-lg font-semibold text-gray-900">{analytics.topPost.likes}</p>
+                          <p className="text-xs text-slate-500 mb-1">Likes</p>
+                          <p className="text-lg font-semibold text-slate-900">{analytics.topPost.likes}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">
+                          <p className="text-xs text-slate-500 mb-1">
                             {selectedPlatform === 'twitter' ? 'Retweets' : selectedPlatform === 'instagram' ? 'Comments' : 'Shares'}
                           </p>
-                          <p className="text-lg font-semibold text-gray-900">
+                          <p className="text-lg font-semibold text-slate-900">
                             {selectedPlatform === 'twitter' 
                               ? (analytics.topPost.retweets || 0) 
                               : selectedPlatform === 'instagram' 
@@ -303,37 +338,42 @@ export default function Analytics() {
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-gray-50 rounded-xl p-8 text-center">
-                      <p className="text-gray-500">No posts yet</p>
+                    <div className="bg-slate-50 rounded-xl p-8 text-center">
+                      <p className="text-slate-500">No posts yet</p>
                     </div>
                   )}
-                </div>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Chart Placeholder */}
-              <div className="bg-white rounded-xl p-6 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Engagement Over Time</h3>
-                <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                  <p className="text-gray-500">Chart visualization coming soon</p>
-                </div>
-              </div>
+              <Card className="border-slate-200">
+                <CardHeader>
+                  <CardTitle className="text-slate-900">Engagement Over Time</CardTitle>
+                  <CardDescription>Visualization coming soon.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 flex items-center justify-center bg-slate-50 rounded-lg">
+                    <p className="text-slate-500">Chart visualization coming soon</p>
+                  </div>
+                </CardContent>
+              </Card>
             </>
           ) : (
-            <div className="bg-white rounded-xl p-12 text-center border border-gray-100">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ChartBarIcon className="w-10 h-10 text-gray-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Data Available</h3>
-              <p className="text-gray-600 mb-6">
-                Connect your {currentPlatform?.name} account to see analytics
-              </p>
-              <button 
-                onClick={() => router.push('/connect')}
-                className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-              >
-                Connect Account
-              </button>
-            </div>
+            <Card className="border-slate-200">
+              <CardContent className="p-12 text-center">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ChartBarIcon className="w-10 h-10 text-slate-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">No Data Available</h3>
+                <p className="text-slate-600 mb-6">
+                  Connect your {currentPlatform?.name} account to see analytics
+                </p>
+                <Button onClick={() => router.push('/connect')}>
+                  Connect Account
+                </Button>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>

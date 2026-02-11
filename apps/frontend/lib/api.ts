@@ -47,6 +47,10 @@ export interface User {
       page_access_token: string
     }>
   }
+  linkedinAccount?: {
+    linkedin_id: string
+    linkedin_name: string
+  }
 }
 
 export interface GeneratedContent {
@@ -122,6 +126,16 @@ export const socialAPI = {
   async unlinkFacebook(): Promise<void> {
     await fetchWithCredentials(`${getApiUrl()}/api/unlink-facebook`, { method: 'POST' })
   },
+
+  // Connect to LinkedIn
+  connectLinkedin() {
+    window.location.href = `${getApiUrl()}/auth/linkedin`
+  },
+
+  // Unlink LinkedIn account
+  async unlinkLinkedin(): Promise<void> {
+    await fetchWithCredentials(`${getApiUrl()}/api/unlink-linkedin`, { method: 'POST' })
+  },
 }
 
 // Content Generation APIs
@@ -143,7 +157,7 @@ export const generationAPI = {
 export const postingAPI = {
   // Post generated content to selected platform
   async postGenerated(params: {
-    platform: 'twitter' | 'instagram' | 'facebook'
+    platform: 'twitter' | 'instagram' | 'facebook' | 'linkedin'
     caption: string
     image_base64?: string
     s3_url?: string
@@ -194,7 +208,7 @@ export const brandAPI = {
 // Analytics APIs
 export const analyticsAPI = {
   // Get analytics for a specific platform
-  async getPlatformAnalytics(platform: 'twitter' | 'instagram' | 'facebook'): Promise<any> {
+  async getPlatformAnalytics(platform: 'twitter' | 'instagram' | 'facebook' | 'linkedin'): Promise<any> {
     try {
       return await fetchWithCredentials(`${getApiUrl()}/api/analytics/${platform}`)
     } catch (error) {
@@ -271,7 +285,7 @@ export const postsAPI = {
     success: boolean
     posts: Array<{
       id: number
-      platform: 'twitter' | 'instagram' | 'facebook'
+      platform: 'twitter' | 'instagram' | 'facebook' | 'linkedin'
       platform_post_id: string
       content: string
       caption: string

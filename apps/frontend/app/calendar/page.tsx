@@ -3,6 +3,15 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/context/AuthContext'
 import Sidebar from '@/components/Sidebar'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { scheduledPostsAPI } from '@/lib/api'
 import { 
   ChevronLeftIcon,
@@ -122,7 +131,7 @@ export default function CalendarPage() {
       case 'twitter':
         return 'bg-blue-500'
       case 'instagram':
-        return 'bg-pink-500'
+        return 'bg-blue-500'
       case 'facebook':
         return 'bg-blue-600'
       default:
@@ -135,7 +144,7 @@ export default function CalendarPage() {
       case 'twitter':
         return '𝕏'
       case 'instagram':
-        return '📷'
+        return 'IG'
       case 'facebook':
         return 'f'
       default:
@@ -145,57 +154,58 @@ export default function CalendarPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-gray-50">
+      <div className="flex h-screen bg-slate-50">
         <Sidebar />
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-lg text-gray-600">Loading...</div>
+          <div className="text-lg text-slate-600">Loading...</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-slate-50">
       <Sidebar />
       
       <div className="flex-1 overflow-auto">
         <div className="max-w-7xl mx-auto p-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Post Calendar</h1>
-            <p className="text-gray-600">View and manage your scheduled social media posts</p>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Post Calendar</h1>
+            <p className="text-slate-600">View and manage your scheduled social media posts</p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Calendar */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <Card className="border-slate-200">
+                <CardContent className="p-6">
                 {/* Month Navigation */}
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-slate-900">
                     {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
                   </h2>
                   <div className="flex space-x-2">
-                    <button
+                    <Button
+                      variant="ghost"
                       onClick={() => navigateMonth('prev')}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Previous month"
                     >
                       <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="secondary"
                       onClick={() => setCurrentDate(new Date())}
-                      className="px-3 py-2 text-sm font-medium text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                     >
                       Today
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="ghost"
                       onClick={() => navigateMonth('next')}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                       title="Next month"
                     >
                       <ChevronRightIcon className="w-5 h-5 text-gray-600" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -203,7 +213,7 @@ export default function CalendarPage() {
                 <div className="grid grid-cols-7 gap-1">
                   {/* Day headers */}
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="text-center text-sm font-semibold text-gray-700 py-2">
+                    <div key={day} className="text-center text-sm font-semibold text-slate-700 py-2">
                       {day}
                     </div>
                   ))}
@@ -222,11 +232,11 @@ export default function CalendarPage() {
                         key={day}
                         className={`aspect-square border rounded-lg p-2 transition-all ${
                           today
-                            ? 'bg-purple-50 border-purple-300 ring-2 ring-purple-200'
-                            : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
+                            ? 'bg-blue-50 border-blue-300 ring-2 ring-blue-200'
+                            : 'border-slate-200 hover:border-blue-300 hover:bg-slate-50'
                         }`}
                       >
-                        <div className={`text-sm font-medium mb-1 ${today ? 'text-purple-600' : 'text-gray-700'}`}>
+                        <div className={`text-sm font-medium mb-1 ${today ? 'text-blue-600' : 'text-slate-700'}`}>
                           {day}
                         </div>
                         <div className="space-y-1">
@@ -236,7 +246,7 @@ export default function CalendarPage() {
                               onClick={() => setSelectedPost(post)}
                               className={`w-full text-left text-xs px-1.5 py-0.5 rounded truncate hover:scale-105 transition-transform ${
                                 post.platforms.includes('twitter') ? 'bg-blue-100 text-blue-700' :
-                                post.platforms.includes('instagram') ? 'bg-pink-100 text-pink-700' :
+                                post.platforms.includes('instagram') ? 'bg-blue-100 text-blue-700' :
                                 'bg-blue-100 text-blue-700'
                               }`}
                               title={post.caption}
@@ -249,7 +259,7 @@ export default function CalendarPage() {
                             </button>
                           ))}
                           {dayPosts.length > 3 && (
-                            <div className="text-xs text-gray-500 px-1.5">
+                            <div className="text-xs text-slate-500 px-1.5">
                               +{dayPosts.length - 3} more
                             </div>
                           )}
@@ -260,32 +270,35 @@ export default function CalendarPage() {
                 </div>
 
                 {loadingPosts && (
-                  <div className="text-center py-8 text-gray-600">
+                  <div className="text-center py-8 text-slate-600">
                     Loading scheduled posts...
                   </div>
                 )}
-              </div>
+              </CardContent>
+            </Card>
             </div>
 
             {/* Post Details Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
+              <Card className="border-slate-200 sticky top-8">
+                <CardContent className="p-6">
                 {selectedPost ? (
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
-                      <h3 className="text-lg font-semibold text-gray-900">Post Details</h3>
-                      <button
+                      <h3 className="text-lg font-semibold text-slate-900">Post Details</h3>
+                      <Button
+                        variant="ghost"
                         onClick={() => handleDeletePost(selectedPost.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-red-600 hover:bg-red-50"
                         title="Delete post"
                       >
                         <TrashIcon className="w-5 h-5" />
-                      </button>
+                      </Button>
                     </div>
 
                     {/* Preview Image */}
                     {selectedPost.image_url && (
-                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                      <div className="aspect-square bg-slate-100 rounded-lg overflow-hidden">
                         <img
                           src={selectedPost.image_url}
                           alt="Post preview"
@@ -295,7 +308,7 @@ export default function CalendarPage() {
                     )}
 
                     {/* Scheduled Time */}
-                    <div className="flex items-center space-x-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                    <div className="flex items-center space-x-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg">
                       <ClockIcon className="w-4 h-4" />
                       <span>{new Date(selectedPost.scheduled_time).toLocaleString('en-US', {
                         weekday: 'short',
@@ -309,88 +322,95 @@ export default function CalendarPage() {
 
                     {/* Platforms */}
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Platforms</p>
+                      <p className="text-sm font-medium text-slate-700 mb-2">Platforms</p>
                       <div className="flex flex-wrap gap-2">
                         {selectedPost.platforms.map(platform => (
-                          <span
+                          <Badge
                             key={platform}
-                            className={`px-3 py-1 rounded-full text-white text-sm font-medium ${getPlatformColor(platform)}`}
+                            className={`text-white ${getPlatformColor(platform)}`}
                           >
                             {getPlatformIcon(platform)} {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
                     </div>
 
                     {/* Caption */}
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Caption</p>
-                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg whitespace-pre-wrap">
+                      <p className="text-sm font-medium text-slate-700 mb-2">Caption</p>
+                      <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg whitespace-pre-wrap">
                         {selectedPost.caption}
                       </p>
                     </div>
 
                     {/* Status */}
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Status</p>
-                      <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                      <p className="text-sm font-medium text-slate-700 mb-2">Status</p>
+                      <Badge className={`${
                         selectedPost.status === 'posted' ? 'bg-green-100 text-green-800' :
                         selectedPost.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-red-100 text-red-800'
                       }`}>
                         {selectedPost.status.charAt(0).toUpperCase() + selectedPost.status.slice(1)}
-                      </span>
+                      </Badge>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-gray-500">
-                    <ClockIcon className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                  <div className="text-center py-12 text-slate-500">
+                    <ClockIcon className="w-12 h-12 mx-auto mb-3 text-slate-400" />
                     <p>Select a scheduled post to view details</p>
                   </div>
                 )}
-              </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
 
           {/* Summary Stats */}
           <div className="mt-6 grid md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Total Scheduled</p>
-                  <p className="text-2xl font-bold text-gray-900">{scheduledPosts.length}</p>
+            <Card className="border-slate-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-600">Total Scheduled</p>
+                    <p className="text-2xl font-bold text-slate-900">{scheduledPosts.length}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <ClockIcon className="w-6 h-6 text-blue-600" />
+                  </div>
                 </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <ClockIcon className="w-6 h-6 text-purple-600" />
+              </CardContent>
+            </Card>
+            <Card className="border-slate-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-600">Pending</p>
+                    <p className="text-2xl font-bold text-slate-900">
+                      {scheduledPosts.filter(p => p.status === 'pending').length}
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <ClockIcon className="w-6 h-6 text-yellow-600" />
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Pending</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {scheduledPosts.filter(p => p.status === 'pending').length}
-                  </p>
+              </CardContent>
+            </Card>
+            <Card className="border-slate-200">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-600">Posted</p>
+                    <p className="text-2xl font-bold text-slate-900">
+                      {scheduledPosts.filter(p => p.status === 'posted').length}
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <ClockIcon className="w-6 h-6 text-green-600" />
+                  </div>
                 </div>
-                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                  <ClockIcon className="w-6 h-6 text-yellow-600" />
-                </div>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Posted</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {scheduledPosts.filter(p => p.status === 'posted').length}
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <ClockIcon className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

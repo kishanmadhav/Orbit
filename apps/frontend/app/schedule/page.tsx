@@ -3,6 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { useAuth } from '@/context/AuthContext'
 import { generationAPI, postingAPI, usageAPI, scheduledPostsAPI } from '@/lib/api'
 import Toast from '@/components/Toast'
@@ -51,26 +59,27 @@ export default function Schedule() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex items-center space-x-3">
-          <ArrowPathIcon className="w-6 h-6 animate-spin text-purple-600" />
-          <span className="text-lg text-gray-600">Loading...</span>
+          <ArrowPathIcon className="w-6 h-6 animate-spin text-blue-600" />
+          <span className="text-lg text-slate-600">Loading...</span>
         </div>
       </div>
     )
   }
 
   const platforms = [
-    { id: 'twitter', name: 'X (Twitter)', icon: 'X', color: 'bg-gray-900', connected: !!user?.twitterAccount },
-    { id: 'instagram', name: 'Instagram', icon: 'ig', color: 'bg-gradient-to-r from-purple-500 to-pink-500', connected: !!user?.facebookAccount?.instagram_accounts?.length },
-    { id: 'facebook', name: 'Facebook', icon: 'f', color: 'bg-blue-600', connected: !!user?.facebookAccount }
+    { id: 'twitter', name: 'X (Twitter)', icon: 'X', color: 'bg-slate-900', connected: !!user?.twitterAccount },
+    { id: 'instagram', name: 'Instagram', icon: 'ig', color: 'bg-blue-500', connected: !!user?.facebookAccount?.instagram_accounts?.length },
+    { id: 'facebook', name: 'Facebook', icon: 'f', color: 'bg-blue-600', connected: !!user?.facebookAccount },
+    { id: 'linkedin', name: 'LinkedIn', icon: 'in', color: 'bg-blue-700', connected: !!user?.linkedinAccount }
   ]
 
   const tones = [
-    { id: 'professional', label: 'Professional', emoji: '💼' },
-    { id: 'casual', label: 'Casual', emoji: '😊' },
-    { id: 'excited', label: 'Excited', emoji: '🎉' },
-    { id: 'informative', label: 'Informative', emoji: '📚' }
+    { id: 'professional', label: 'Professional' },
+    { id: 'casual', label: 'Casual' },
+    { id: 'excited', label: 'Excited' },
+    { id: 'informative', label: 'Informative' }
   ]
 
   const togglePlatform = (platformId: string) => {
@@ -171,7 +180,7 @@ export default function Schedule() {
 
         try {
           const result = await postingAPI.postGenerated({
-            platform: platformId as 'twitter' | 'instagram' | 'facebook',
+            platform: platformId as 'twitter' | 'instagram' | 'facebook' | 'linkedin',
             caption: caption,
             image_base64: postMode === 'generate' ? generatedContent?.image_base64 : uploadedImage || undefined,
             s3_url: postMode === 'generate' ? generatedContent?.s3_url : undefined,
@@ -277,58 +286,58 @@ export default function Schedule() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
       
       <div className="flex-1">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-10">
+        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-10">
           <div className="px-8 py-5">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900 mb-1">Schedule Post</h1>
-              <p className="text-sm text-gray-500">Generate AI content or upload your own, then post to Twitter, Instagram, or Facebook</p>
+              <h1 className="text-2xl font-semibold text-slate-900 mb-1">Schedule Post</h1>
+              <p className="text-sm text-slate-500">Generate AI content or upload your own, then post to Twitter, Instagram, or Facebook</p>
             </div>
           </div>
         </header>
 
         <div className="p-8 max-w-7xl mx-auto">
           {/* Mode Toggle */}
-          <div className="bg-white rounded-xl p-2 shadow-sm border border-gray-100 mb-8 flex space-x-2 max-w-md">
-            <button
+          <Card className="mb-8 max-w-md border-slate-200">
+            <CardContent className="p-2 flex space-x-2">
+            <Button
               onClick={() => setPostMode('generate')}
-              className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                postMode === 'generate'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
+              variant={postMode === 'generate' ? 'default' : 'secondary'}
+              className="flex-1"
             >
               <SparklesIcon className="w-5 h-5" />
               <span>Generate with AI</span>
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setPostMode('upload')}
-              className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                postMode === 'upload'
-                  ? 'bg-purple-600 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
+              variant={postMode === 'upload' ? 'default' : 'secondary'}
+              className="flex-1"
             >
               <PhotoIcon className="w-5 h-5" />
               <span>Upload Own</span>
-            </button>
-          </div>
+            </Button>
+            </CardContent>
+          </Card>
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Left Panel - Content Creation */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white rounded-2xl p-8 border border-gray-100">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">Create Content</h2>
+              <Card className="border-slate-200">
+                <CardHeader>
+                  <CardTitle className="text-slate-900">Create Content</CardTitle>
+                  <CardDescription>Generate with AI or upload your own media.</CardDescription>
+                </CardHeader>
+                <CardContent>
 
                 {postMode === 'generate' ? (
                   <div className="space-y-6">
                     {/* AI Generation */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-3">
+                      <label className="block text-sm font-medium text-slate-900 mb-3">
                         What would you like to post about?
                       </label>
                       <textarea
@@ -336,39 +345,32 @@ export default function Schedule() {
                         onChange={(e) => setPrompt(e.target.value)}
                         placeholder="e.g., Announce our new product launch with excitement..."
                         rows={4}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       />
                     </div>
 
                     {/* Tone Selection */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-3">Tone</label>
+                      <label className="block text-sm font-medium text-slate-900 mb-3">Tone</label>
                       <div className="flex flex-wrap gap-2">
                         {tones.map((t) => (
-                          <button
+                          <Button
                             key={t.id}
                             onClick={() => setTone(t.id)}
-                            className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                              tone === t.id
-                                ? 'bg-gray-900 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                            variant={tone === t.id ? 'default' : 'secondary'}
+                            className={tone === t.id ? 'bg-slate-900 hover:bg-slate-800' : ''}
                           >
-                            {t.emoji} {t.label}
-                          </button>
+                            {t.label}
+                          </Button>
                         ))}
                       </div>
                     </div>
 
                     {/* Generate Button */}
-                    <button
+                    <Button
                       onClick={handleGenerate}
                       disabled={!prompt.trim() || isGenerating}
-                      className={`w-full py-4 rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
-                        !prompt.trim() || isGenerating
-                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          : 'bg-purple-600 text-white hover:bg-purple-700 shadow-md hover:shadow-lg'
-                      }`}
+                      className="w-full py-6"
                     >
                       {isGenerating ? (
                         <>
@@ -381,7 +383,7 @@ export default function Schedule() {
                           <span>Generate Content</span>
                         </>
                       )}
-                    </button>
+                    </Button>
 
                     {/* Generated Preview */}
                     {generatedContent && (
@@ -402,10 +404,10 @@ export default function Schedule() {
                   <div className="space-y-6">
                     {/* Image Upload */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-3">
+                      <label className="block text-sm font-medium text-slate-900 mb-3">
                         Upload Image
                       </label>
-                      <label className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-400 hover:bg-purple-50/30 transition-all duration-200 cursor-pointer block">
+                      <label className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50/30 transition-all duration-200 cursor-pointer block">
                         <input
                           type="file"
                           accept="image/*"
@@ -416,9 +418,9 @@ export default function Schedule() {
                           <img src={uploadedImage} alt="Uploaded" className="max-h-64 mx-auto rounded-lg" />
                         ) : (
                           <>
-                            <PhotoIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                            <p className="text-purple-600 font-medium">Choose File</p>
-                            <p className="text-sm text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                            <PhotoIcon className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                            <p className="text-blue-600 font-medium">Choose File</p>
+                            <p className="text-sm text-slate-500 mt-1">PNG, JPG up to 5MB</p>
                           </>
                         )}
                       </label>
@@ -428,7 +430,7 @@ export default function Schedule() {
 
                 {/* Caption (for both modes) */}
                 <div className="mt-6">
-                  <label className="block text-sm font-medium text-gray-900 mb-3">
+                  <label className="block text-sm font-medium text-slate-900 mb-3">
                     Caption
                   </label>
                   <textarea
@@ -436,16 +438,16 @@ export default function Schedule() {
                     onChange={(e) => setCaption(e.target.value)}
                     placeholder="Write your caption here..."
                     rows={4}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   />
                 </div>
 
                 {/* Platform Selection */}
                 <div className="mt-6">
-                  <label className="block text-sm font-medium text-gray-900 mb-3">
+                  <label className="block text-sm font-medium text-slate-900 mb-3">
                     Select Platforms
                   </label>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {platforms.map((platform) => (
                       <button
                         key={platform.id}
@@ -453,18 +455,18 @@ export default function Schedule() {
                         disabled={!platform.connected}
                         className={`flex flex-col items-center space-y-2 p-4 rounded-xl border-2 transition-all duration-200 ${
                           selectedPlatforms.includes(platform.id)
-                            ? 'border-purple-500 bg-purple-50/50'
+                            ? 'border-blue-500 bg-blue-50/50'
                             : platform.connected
-                            ? 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                            : 'border-gray-200 bg-gray-100 cursor-not-allowed opacity-50'
+                            ? 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                            : 'border-slate-200 bg-slate-100 cursor-not-allowed opacity-50'
                         }`}
                       >
                         <div className={`w-10 h-10 ${platform.color} rounded-lg flex items-center justify-center shadow-sm`}>
                           <span className="text-white text-xs font-bold">{platform.icon}</span>
                         </div>
-                        <span className="text-xs font-medium text-gray-700">{platform.name}</span>
+                        <span className="text-xs font-medium text-slate-700">{platform.name}</span>
                         {selectedPlatforms.includes(platform.id) && (
-                          <CheckCircleIcon className="w-5 h-5 text-purple-600" />
+                          <CheckCircleIcon className="w-5 h-5 text-blue-600" />
                         )}
                       </button>
                     ))}
@@ -472,17 +474,17 @@ export default function Schedule() {
 
                   {/* Post as Story checkbox - only show for Instagram */}
                   {selectedPlatforms.includes('instagram') && (
-                    <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-xl">
+                    <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                       <label className="flex items-center space-x-3 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={postAsStory}
                           onChange={(e) => setPostAsStory(e.target.checked)}
-                          className="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                          className="w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
                         />
                         <div>
-                          <span className="text-sm font-medium text-gray-900">Post as Instagram Story</span>
-                          <p className="text-xs text-gray-600 mt-0.5">
+                          <span className="text-sm font-medium text-slate-900">Post as Instagram Story</span>
+                          <p className="text-xs text-slate-600 mt-0.5">
                             Stories disappear after 24 hours
                           </p>
                         </div>
@@ -490,25 +492,23 @@ export default function Schedule() {
                     </div>
                   )}
                 </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Right Panel - Posting Options */}
             <div className="space-y-6">
               {/* Post Now */}
-              <div className="bg-white rounded-2xl p-6 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Post Now</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Publish immediately to selected platforms
-                </p>
-                <button
+              <Card className="border-slate-200">
+                <CardHeader>
+                  <CardTitle className="text-slate-900">Post Now</CardTitle>
+                  <CardDescription>Publish immediately to selected platforms.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button
                   onClick={handlePostNow}
                   disabled={isPosting || selectedPlatforms.length === 0}
-                  className={`w-full py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
-                    isPosting || selectedPlatforms.length === 0
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-purple-600 text-white hover:bg-purple-700 shadow-md'
-                  }`}
+                  className="w-full"
                 >
                   {isPosting ? (
                     <>
@@ -521,59 +521,65 @@ export default function Schedule() {
                       <span>Post Now</span>
                     </>
                   )}
-                </button>
-              </div>
+                  </Button>
+                </CardContent>
+              </Card>
 
               {/* Schedule for Later */}
-              <div className="bg-white rounded-2xl p-6 border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Schedule for Later</h3>
-                <div className="space-y-4">
+              <Card className="border-slate-200">
+                <CardHeader>
+                  <CardTitle className="text-slate-900">Schedule for Later</CardTitle>
+                  <CardDescription>Choose a future date and time.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Date</label>
                     <input
                       type="date"
                       value={scheduleDate}
                       min={new Date().toISOString().split('T')[0]}
                       onChange={(e) => setScheduleDate(e.target.value)}
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Time</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Time</label>
                     <input
                       type="time"
                       value={scheduleTime}
                       onChange={(e) => setScheduleTime(e.target.value)}
-                      className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
-                  <p className="text-xs text-gray-500">
-                    🕐 Your timezone: {Intl.DateTimeFormat().resolvedOptions().timeZone}
+                  <p className="text-xs text-slate-500">
+                    Your timezone: {Intl.DateTimeFormat().resolvedOptions().timeZone}
                   </p>
-                  <button
+                  <Button
                     onClick={handleSchedulePost}
                     disabled={!scheduleDate || !scheduleTime}
-                    className={`w-full py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
-                      !scheduleDate || !scheduleTime
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-gray-900 text-white hover:bg-gray-800 shadow-md'
-                    }`}
+                    className="w-full"
+                    variant="secondary"
                   >
                     <CalendarIcon className="w-5 h-5" />
                     <span>Schedule Post</span>
-                  </button>
-                </div>
-              </div>
+                  </Button>
+                </CardContent>
+              </Card>
 
               {/* Tips */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <h4 className="text-sm font-semibold text-blue-900 mb-2">💡 Tips</h4>
-                <ul className="space-y-1 text-xs text-blue-800">
+              <Card className="border-blue-200 bg-blue-50/60">
+                <CardHeader>
+                  <CardTitle className="text-sm text-blue-900">Tips</CardTitle>
+                  <CardDescription className="text-blue-800">Posting best practices.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-1 text-xs text-blue-800">
                   <li>• Best times: 9-11 AM, 1-3 PM</li>
                   <li>• Use relevant hashtags</li>
                   <li>• Engage with comments</li>
-                </ul>
-              </div>
+                  </ul>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

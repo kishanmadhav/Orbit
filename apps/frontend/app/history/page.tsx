@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/context/AuthContext'
 import { postsAPI } from '@/lib/api'
 import { 
@@ -15,7 +18,7 @@ import {
 
 interface Post {
   id: number
-  platform: 'twitter' | 'instagram' | 'facebook'
+  platform: 'twitter' | 'instagram' | 'facebook' | 'linkedin'
   platform_post_id: string
   content: string
   caption: string
@@ -86,9 +89,10 @@ export default function PostHistory() {
 
   const getPlatformColor = (platform: string) => {
     switch (platform) {
-      case 'twitter': return 'bg-gray-900'
-      case 'instagram': return 'bg-gradient-to-r from-purple-500 to-pink-500'
+      case 'twitter': return 'bg-slate-900'
+      case 'instagram': return 'bg-blue-500'
       case 'facebook': return 'bg-blue-600'
+      case 'linkedin': return 'bg-blue-700'
       default: return 'bg-gray-500'
     }
   }
@@ -98,6 +102,7 @@ export default function PostHistory() {
       case 'twitter': return 'X'
       case 'instagram': return 'ig'
       case 'facebook': return 'f'
+      case 'linkedin': return 'in'
       default: return '?'
     }
   }
@@ -117,169 +122,154 @@ export default function PostHistory() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex items-center space-x-3">
-          <ArrowPathIcon className="w-6 h-6 animate-spin text-purple-600" />
-          <span className="text-lg text-gray-600">Loading...</span>
+          <ArrowPathIcon className="w-6 h-6 animate-spin text-blue-600" />
+          <span className="text-lg text-slate-600">Loading...</span>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
       
       <div className="flex-1">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-10">
+        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-10">
           <div className="px-8 py-5">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900 mb-1">Post History</h1>
-              <p className="text-sm text-gray-500">View all your published posts and stories across platforms</p>
+              <h1 className="text-2xl font-semibold text-slate-900 mb-1">Post History</h1>
+              <p className="text-sm text-slate-500">View all your published posts and stories across platforms</p>
             </div>
           </div>
         </header>
 
         <div className="p-8 max-w-7xl mx-auto">
           {/* Filters */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
+          <Card className="mb-6 border-slate-200">
+            <CardContent className="p-6">
             <div className="flex flex-wrap gap-4">
               {/* Platform Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Platform</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Platform</label>
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={() => setSelectedPlatform('all')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedPlatform === 'all'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                    variant={selectedPlatform === 'all' ? 'default' : 'secondary'}
                   >
                     All
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => setSelectedPlatform('twitter')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedPlatform === 'twitter'
-                        ? 'bg-gray-900 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                    variant={selectedPlatform === 'twitter' ? 'default' : 'secondary'}
+                    className={selectedPlatform === 'twitter' ? 'bg-slate-900 hover:bg-slate-800' : ''}
                   >
                     X
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => setSelectedPlatform('instagram')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedPlatform === 'instagram'
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                    variant={selectedPlatform === 'instagram' ? 'default' : 'secondary'}
+                    className={selectedPlatform === 'instagram' ? 'bg-blue-600 hover:bg-blue-700' : ''}
                   >
                     Instagram
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => setSelectedPlatform('facebook')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedPlatform === 'facebook'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                    variant={selectedPlatform === 'facebook' ? 'default' : 'secondary'}
                   >
                     Facebook
-                  </button>
+                  </Button>
+                  <Button
+                    onClick={() => setSelectedPlatform('linkedin')}
+                    variant={selectedPlatform === 'linkedin' ? 'default' : 'secondary'}
+                    className={selectedPlatform === 'linkedin' ? 'bg-blue-700 hover:bg-blue-800' : ''}
+                  >
+                    LinkedIn
+                  </Button>
                 </div>
               </div>
 
               {/* Type Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Type</label>
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={() => setSelectedType('all')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedType === 'all'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                    variant={selectedType === 'all' ? 'default' : 'secondary'}
                   >
                     All
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => setSelectedType('posts')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedType === 'posts'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                    variant={selectedType === 'posts' ? 'default' : 'secondary'}
                   >
                     Posts
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => setSelectedType('stories')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedType === 'stories'
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
+                    variant={selectedType === 'stories' ? 'default' : 'secondary'}
                   >
                     Stories
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
 
             {/* Stats */}
-            <div className="mt-4 pt-4 border-t border-gray-200">
+            <div className="mt-4 pt-4 border-t border-slate-200">
               <div className="flex gap-6 text-sm">
                 <div>
-                  <span className="text-gray-600">Total Posts:</span>
-                  <span className="ml-2 font-semibold text-gray-900">{filteredPosts.length}</span>
+                  <span className="text-slate-600">Total Posts:</span>
+                  <span className="ml-2 font-semibold text-slate-900">{filteredPosts.length}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Regular Posts:</span>
-                  <span className="ml-2 font-semibold text-gray-900">
+                  <span className="text-slate-600">Regular Posts:</span>
+                  <span className="ml-2 font-semibold text-slate-900">
                     {filteredPosts.filter(p => !p.is_story).length}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Stories:</span>
-                  <span className="ml-2 font-semibold text-gray-900">
+                  <span className="text-slate-600">Stories:</span>
+                  <span className="ml-2 font-semibold text-slate-900">
                     {filteredPosts.filter(p => p.is_story).length}
                   </span>
                 </div>
               </div>
             </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Posts Grid */}
           {isLoading ? (
             <div className="flex items-center justify-center py-20">
               <div className="flex items-center space-x-3">
-                <ArrowPathIcon className="w-6 h-6 animate-spin text-purple-600" />
-                <span className="text-lg text-gray-600">Loading posts...</span>
+                <ArrowPathIcon className="w-6 h-6 animate-spin text-blue-600" />
+                <span className="text-lg text-slate-600">Loading posts...</span>
               </div>
             </div>
           ) : filteredPosts.length === 0 ? (
-            <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-100">
-              <PhotoIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No posts found</h3>
-              <p className="text-gray-600">
+            <Card className="border-slate-200">
+              <CardContent className="p-12 text-center">
+                <PhotoIcon className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No posts found</h3>
+                <p className="text-slate-600">
                 {selectedPlatform !== 'all' || selectedType !== 'all'
                   ? 'Try adjusting your filters'
                   : 'Start creating content to see it here'}
-              </p>
-            </div>
+                </p>
+              </CardContent>
+            </Card>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredPosts.map((post) => (
-                <div
+                <Card
                   key={post.id}
-                  className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-shadow"
+                  className="border-slate-200 shadow-sm hover:shadow-md transition-shadow"
                 >
                   {/* Post Header */}
-                  <div className="p-4 border-b border-gray-100">
+                  <CardHeader className="p-4 border-b border-slate-200">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className={`w-10 h-10 ${getPlatformColor(post.platform)} rounded-lg flex items-center justify-center shadow-sm`}>
@@ -288,25 +278,25 @@ export default function PostHistory() {
                           </span>
                         </div>
                         <div>
-                          <div className="font-medium text-gray-900 capitalize">{post.platform}</div>
-                          <div className="flex items-center space-x-2 text-xs text-gray-500">
+                          <div className="font-medium text-slate-900 capitalize">{post.platform}</div>
+                          <div className="flex items-center space-x-2 text-xs text-slate-500">
                             <ClockIcon className="w-3 h-3" />
                             <span>{formatDate(post.posted_at)}</span>
                           </div>
                         </div>
                       </div>
                       {post.is_story && (
-                        <div className="flex items-center space-x-1 px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                        <Badge className="flex items-center space-x-1 bg-blue-100 text-blue-700">
                           <FilmIcon className="w-3 h-3" />
                           <span>Story</span>
-                        </div>
+                        </Badge>
                       )}
                     </div>
-                  </div>
+                  </CardHeader>
 
                   {/* Post Media */}
                   {post.media_url && (
-                    <div className="relative aspect-square bg-gray-100">
+                    <div className="relative aspect-square bg-slate-100">
                       <img
                         src={post.media_url}
                         alt="Post media"
@@ -316,8 +306,8 @@ export default function PostHistory() {
                   )}
 
                   {/* Post Content */}
-                  <div className="p-4">
-                    <p className="text-sm text-gray-700 line-clamp-3">
+                  <CardContent className="p-4">
+                    <p className="text-sm text-slate-700 line-clamp-3">
                       {post.caption || post.content || 'No caption'}
                     </p>
                     
@@ -326,14 +316,14 @@ export default function PostHistory() {
                         href={post.permalink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-3 inline-flex items-center space-x-2 text-sm text-purple-600 hover:text-purple-700 font-medium"
+                        className="mt-3 inline-flex items-center space-x-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
                       >
                         <LinkIcon className="w-4 h-4" />
                         <span>View on {post.platform}</span>
                       </a>
                     )}
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}

@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'standalone', // Enable standalone build for Docker
+  output: 'export', // Static export for S3 hosting
+  trailingSlash: true, // Generates /page/index.html for S3 compatibility
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -14,18 +15,6 @@ const nextConfig = {
         hostname: 'post-to-x-bucket.s3.eu-north-1.amazonaws.com',
       },
     ],
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/:path*`,
-      },
-      {
-        source: '/auth/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/auth/:path*`,
-      },
-    ]
   },
 }
 

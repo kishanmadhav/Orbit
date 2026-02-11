@@ -3,6 +3,15 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { useAuth } from '@/context/AuthContext'
 import { socialAPI, brandAPI, analyticsAPI, postsAPI } from '@/lib/api'
 import { 
@@ -48,7 +57,7 @@ export default function Dashboard() {
   useEffect(() => {
     // Don't redirect if we're in the middle of an OAuth callback
     const params = new URLSearchParams(window.location.search)
-    const isOAuthCallback = params.get('twitter_linked') || params.get('facebook_linked')
+    const isOAuthCallback = params.get('twitter_linked') || params.get('facebook_linked') || params.get('linkedin_linked')
     
     if (!loading && !user && !isOAuthCallback) {
       router.push('/')
@@ -58,7 +67,7 @@ export default function Dashboard() {
   // Refresh user data after OAuth callback (if redirected here)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    if (params.get('twitter_linked') || params.get('facebook_linked')) {
+    if (params.get('twitter_linked') || params.get('facebook_linked') || params.get('linkedin_linked')) {
       console.log('OAuth callback detected, refreshing user data...')
       refreshUser()
       // Clean up URL
@@ -111,11 +120,12 @@ export default function Dashboard() {
         }
 
         // Fetch analytics for connected platforms using the API wrapper
-        const platforms: Array<'twitter' | 'instagram' | 'facebook'> = []
+        const platforms: Array<'twitter' | 'instagram' | 'facebook' | 'linkedin'> = []
         
         if (user.twitterAccount) platforms.push('twitter')
         if (user.facebookAccount?.instagram_accounts?.length) platforms.push('instagram')
         if (user.facebookAccount) platforms.push('facebook')
+        if (user.linkedinAccount) platforms.push('linkedin')
 
         console.log('Fetching analytics for platforms:', platforms)
 
@@ -162,10 +172,10 @@ export default function Dashboard() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex items-center space-x-3">
-          <ArrowPathIcon className="w-6 h-6 animate-spin text-purple-600" />
-          <span className="text-lg text-gray-600">Loading...</span>
+          <ArrowPathIcon className="w-6 h-6 animate-spin text-blue-600" />
+          <span className="text-lg text-slate-600">Loading...</span>
         </div>
       </div>
     )
@@ -187,8 +197,8 @@ export default function Dashboard() {
       change: '', 
       trend: 'up', 
       icon: CalendarIcon, 
-      color: 'bg-purple-50', 
-      iconColor: 'text-purple-600' 
+      color: 'bg-blue-50', 
+      iconColor: 'text-blue-600' 
     },
     { 
       name: 'Total Impressions', 
@@ -205,8 +215,8 @@ export default function Dashboard() {
       change: '', 
       trend: 'up', 
       icon: HeartIcon, 
-      color: 'bg-pink-50', 
-      iconColor: 'text-pink-600' 
+      color: 'bg-blue-50', 
+      iconColor: 'text-blue-600' 
     },
     { 
       name: 'Total Comments', 
@@ -214,8 +224,8 @@ export default function Dashboard() {
       change: '', 
       trend: 'up', 
       icon: ChatBubbleLeftIcon, 
-      color: 'bg-orange-50', 
-      iconColor: 'text-orange-600' 
+      color: 'bg-blue-50', 
+      iconColor: 'text-blue-600' 
     },
   ]
 
@@ -241,7 +251,7 @@ export default function Dashboard() {
     { 
       name: 'Instagram', 
       icon: 'ig', 
-      color: 'bg-gradient-to-r from-purple-500 to-pink-500', 
+      color: 'bg-blue-500', 
       connected: !!user?.facebookAccount?.instagram_accounts?.length,
       username: user?.facebookAccount?.instagram_accounts?.[0]?.instagram_username || '',
       onConnect: () => socialAPI.connectFacebook(), // Instagram connects via Facebook
@@ -258,7 +268,7 @@ export default function Dashboard() {
     { 
       name: 'X (Twitter)', 
       icon: 'X', 
-      color: 'bg-gray-900', 
+      color: 'bg-slate-900', 
       connected: !!user?.twitterAccount,
       username: user?.twitterAccount?.username || '',
       onConnect: () => socialAPI.connectTwitter(),
@@ -272,203 +282,223 @@ export default function Dashboard() {
         }
       }
     },
+    { 
+      name: 'LinkedIn', 
+      icon: 'in', 
+      color: 'bg-blue-700', 
+      connected: !!user?.linkedinAccount,
+      username: user?.linkedinAccount?.linkedin_name || '',
+      onConnect: () => socialAPI.connectLinkedin(),
+      onDisconnect: async () => {
+        try {
+          await socialAPI.unlinkLinkedin()
+          await refreshUser()
+        } catch (error) {
+          console.error('Failed to unlink LinkedIn:', error)
+          throw error
+        }
+      }
+    },
   ]
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
       
       <div className="flex-1">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100 sticky top-0 z-10">
+        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-10">
           <div className="px-8 py-5 flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl flex items-center justify-center shadow-sm">
+              <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
                 <span className="text-white font-bold text-sm">SG</span>
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">Social Genie</h1>
-                <p className="text-xs text-gray-500">a product by Agentic Genie</p>
+                <h1 className="text-xl font-semibold text-slate-900">Social Genie</h1>
+                <p className="text-xs text-slate-500">a product by Agentic Genie</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Link 
-                href="/generator"
-                className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 px-4 py-2.5 rounded-xl font-medium text-white transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                <SparklesIcon className="w-4 h-4" />
-                <span>Generate Content</span>
-              </Link>
+              <Button asChild className="shadow-sm">
+                <Link href="/generator">
+                  <SparklesIcon className="w-4 h-4" />
+                  <span>Generate Content</span>
+                </Link>
+              </Button>
             </div>
           </div>
         </header>
 
         <div className="p-8 max-w-7xl mx-auto">
           {/* Hero Banner */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 mb-8 text-white relative overflow-hidden">
-            <div className="relative z-10">
-              <h2 className="text-3xl font-semibold mb-2">
+          <Card className="mb-8 border-slate-200 bg-white shadow-sm">
+            <CardContent className="p-8">
+              <Badge variant="secondary" className="mb-3 text-xs text-slate-600">
+                Overview
+              </Badge>
+              <h2 className="text-3xl font-semibold text-slate-900 mb-2">
                 Welcome back, {organizationName || user.displayName}!
               </h2>
-              <p className="text-gray-300 text-lg font-light">Here's what's happening with your brand today.</p>
-            </div>
-            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500 rounded-full opacity-10 blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-400 rounded-full opacity-5 blur-3xl"></div>
-          </div>
+              <p className="text-slate-600 text-lg font-light">Here's what's happening with your brand today.</p>
+            </CardContent>
+          </Card>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {stats.map((stat) => (
-              <div 
+              <Card 
                 key={stat.name} 
-                className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                className="border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 group"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 ${stat.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                    <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
-                  </div>
-                  {stat.change && (
-                    <div className="flex items-center space-x-1 text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-full">
-                      <span>↑</span>
-                      <span>{stat.change}</span>
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-12 h-12 ${stat.color} rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
+                      <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
                     </div>
-                  )}
-                </div>
-                <p className="text-sm font-medium text-gray-500 mb-1">{stat.name}</p>
-                <p className="text-3xl font-semibold text-gray-900">{stat.value}</p>
-              </div>
+                    {stat.change && (
+                      <div className="flex items-center space-x-1 text-green-600 text-xs font-medium bg-green-50 px-2 py-1 rounded-full">
+                        <span>↑</span>
+                        <span>{stat.change}</span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-sm font-medium text-slate-500 mb-1">{stat.name}</p>
+                  <p className="text-3xl font-semibold text-slate-900">{stat.value}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
             {/* AI Content Generator */}
-            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-8 border border-purple-100 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200 rounded-full opacity-20 blur-2xl"></div>
-              <div className="relative z-10">
+            <Card className="border-blue-100 bg-blue-50/60">
+              <CardContent className="p-8">
                 <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                  <SparklesIcon className="w-7 h-7 text-purple-600" />
+                  <SparklesIcon className="w-7 h-7 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">AI Generator</h3>
-                <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-                  Create engaging social media content instantly with DALL-E 3 and GPT-4 powered generation.
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">AI Generator</h3>
+                <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+                  Create engaging social media content instantly with Sora 2 visuals and GPT-4 captions.
                 </p>
-                <Link 
-                  href="/generator"
-                  className="inline-flex w-full bg-purple-600 text-white py-3.5 px-4 rounded-xl hover:bg-purple-700 items-center justify-center space-x-2 font-medium transition-all duration-200 shadow-md hover:shadow-lg"
-                >
-                  <SparklesIcon className="w-5 h-5" />
-                  <span>Generate Content</span>
-                </Link>
+                <Button asChild className="w-full shadow-sm">
+                  <Link href="/generator">
+                    <SparklesIcon className="w-5 h-5" />
+                    <span>Generate Content</span>
+                  </Link>
+                </Button>
                 
-                <div className="mt-6 pt-6 border-t border-purple-200/50">
+                <div className="mt-6 pt-6 border-t border-blue-100">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">AI-Powered</span>
-                    <span className="font-semibold text-gray-900">DALL-E 3 + GPT-4</span>
+                    <span className="text-slate-600">AI-Powered</span>
+                    <span className="font-semibold text-slate-900">Sora 2 + GPT-4</span>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Quick Start Guide */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-100">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">Quick Start Guide</h3>
-              <div className="space-y-4">
+            <Card className="border-slate-200 bg-white">
+              <CardHeader>
+                <CardTitle className="text-slate-900">Quick Start Guide</CardTitle>
+                <CardDescription>Get up and running in minutes.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-purple-600 font-bold text-sm">1</span>
+                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-blue-600 font-bold text-sm">1</span>
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-1">Connect Your Accounts</h4>
-                    <p className="text-sm text-gray-600">Link your Twitter, Instagram, and Facebook accounts below</p>
+                    <h4 className="font-medium text-slate-900 mb-1">Connect Your Accounts</h4>
+                    <p className="text-sm text-slate-600">Link your Twitter, Instagram, Facebook, and LinkedIn accounts below</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-purple-600 font-bold text-sm">2</span>
+                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-blue-600 font-bold text-sm">2</span>
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-1">Generate AI Content</h4>
-                    <p className="text-sm text-gray-600">Use our AI generator to create images and captions</p>
+                    <h4 className="font-medium text-slate-900 mb-1">Generate AI Content</h4>
+                    <p className="text-sm text-slate-600">Use our AI generator to create images and captions</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-purple-600 font-bold text-sm">3</span>
+                  <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-blue-600 font-bold text-sm">3</span>
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-1">Post & Schedule</h4>
-                    <p className="text-sm text-gray-600">Post immediately or schedule for later</p>
+                    <h4 className="font-medium text-slate-900 mb-1">Post & Schedule</h4>
+                    <p className="text-sm text-slate-600">Post immediately or schedule for later</p>
                   </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Social Connections */}
-          <div className="bg-white rounded-2xl p-8 border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
+          <Card className="border-slate-200 bg-white">
+            <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-1">Social Connections</h3>
-                <p className="text-sm text-gray-500">Manage your connected social media accounts</p>
+                <CardTitle className="text-slate-900">Social Connections</CardTitle>
+                <CardDescription>Manage your connected social media accounts.</CardDescription>
               </div>
-              <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full font-medium">
+              <Badge variant="secondary" className="text-xs text-slate-600">
                 {socialPlatforms.filter(p => p.connected).length}/{socialPlatforms.length} connected
-              </span>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-4">
-              {socialPlatforms.map((platform) => (
-                <div 
-                  key={platform.name}
-                  className={`flex items-center justify-between p-5 rounded-xl border-2 transition-all duration-200 ${
-                    platform.connected
-                      ? 'border-purple-200 bg-purple-50/50'
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
-                  }`}
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className={`w-12 h-12 ${platform.color} rounded-xl flex items-center justify-center shadow-sm`}>
-                      <span className="text-white text-sm font-bold">{platform.icon}</span>
+              </Badge>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-4">
+                {socialPlatforms.map((platform) => (
+                  <div 
+                    key={platform.name}
+                    className={`flex items-center justify-between p-5 rounded-xl border transition-all duration-200 ${
+                      platform.connected
+                        ? 'border-blue-200 bg-blue-50/50'
+                        : 'border-slate-200 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className={`w-12 h-12 ${platform.color} rounded-xl flex items-center justify-center shadow-sm`}>
+                        <span className="text-white text-sm font-bold">{platform.icon}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-slate-900 block">{platform.name}</span>
+                        <span className="text-xs text-slate-500">
+                          {platform.connected ? `@${platform.username}` : 'Not connected'}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="font-medium text-gray-900 block">{platform.name}</span>
-                      <span className="text-xs text-gray-500">
-                        {platform.connected ? `@${platform.username}` : 'Not connected'}
-                      </span>
-                    </div>
-                  </div>
-                  {platform.connected ? (
-                    <div className="flex items-center space-x-2">
-                      <CheckCircleIcon className="w-6 h-6 text-purple-600" />
-                      <button 
-                        onClick={async (e) => {
-                          e.preventDefault()
-                          if (confirm(`Are you sure you want to disconnect ${platform.name}?`)) {
-                            try {
-                              await platform.onDisconnect()
-                            } catch (error) {
-                              console.error(`Failed to disconnect ${platform.name}:`, error)
-                              alert(`Failed to disconnect ${platform.name}. Please try again.`)
+                    {platform.connected ? (
+                      <div className="flex items-center space-x-2">
+                        <CheckCircleIcon className="w-6 h-6 text-blue-600" />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={async (e) => {
+                            e.preventDefault()
+                            if (confirm(`Are you sure you want to disconnect ${platform.name}?`)) {
+                              try {
+                                await platform.onDisconnect()
+                              } catch (error) {
+                                console.error(`Failed to disconnect ${platform.name}:`, error)
+                                alert(`Failed to disconnect ${platform.name}. Please try again.`)
+                              }
                             }
-                          }
-                        }}
-                        className="text-xs text-gray-500 hover:text-red-600 transition-colors font-medium"
-                      >
-                        Disconnect
-                      </button>
-                    </div>
-                  ) : (
-                    <button 
-                      onClick={platform.onConnect}
-                      className="bg-gray-900 text-white px-5 py-2 rounded-lg hover:bg-gray-800 font-medium transition-colors text-sm"
-                    >
-                      Connect
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
+                          }}
+                          className="text-xs text-slate-500 hover:text-red-600"
+                        >
+                          Disconnect
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button onClick={platform.onConnect} size="sm">
+                        Connect
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
