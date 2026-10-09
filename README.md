@@ -1,6 +1,6 @@
-# Social-Genie
+# Orbit
 
-Social-Genie is an AI-powered social media automation platform that provides a single workspace for creating, managing, and publishing content across multiple social platforms.
+Orbit is an AI-powered social media automation platform that provides a single workspace for creating, managing, and publishing content across multiple social platforms.
 
 ## Features
 
